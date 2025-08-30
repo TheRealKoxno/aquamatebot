@@ -42,6 +42,18 @@ def main():
     application.add_handler(CommandHandler("reset_today", reset_today_cmd))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo_numbers))
 
+async def error_handler(update, context):
+    import logging
+    logging.getLogger("waterbot").exception("Unhandled error", exc_info=context.error)
+    if update and update.effective_chat:
+        try:
+            await update.effective_chat.send_message("⚠️ Что-то пошло не так. Уже чиним.")
+        except Exception:
+            pass
+
+    application.add_error_handler(error_handler)
+
+
     application.run_polling(close_loop=False)
 
 
